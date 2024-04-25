@@ -1,0 +1,8 @@
+/node_modules
+
+/data/banner_images/*
+/data/slider_images/*
+/data/product_images/*
+/data/category_images/*
+/data/subCategory_images/*
+/data/user_profile/*
