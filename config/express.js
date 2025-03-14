@@ -1,26 +1,29 @@
-const express = require('express')
-const cors = require('cors')
-const bodyParser = require('body-parser')
-const cookieParser = require('cookie-parser')
-const multer = require('multer')
-const path = require('path')
-const routers = require('../routers/index')
-const async = require('async');
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import router from "../src/routes/index.js";
 
-module.exports = () => {
-    let app = express()
-    app.use([
-        cors(),
-        cookieParser(),
-        express.static('./data', {
-            maxAge: '1d'
-        }),
-        bodyParser.json({ limit: '50mb' }),
-		bodyParser.urlencoded({ limit: '50mb', extended: true }),
-        multer().any()
-    ])
-    // require('../routers/index')
-    routers(app)
-    // app.use('/admin', require('../routers/admin.routers'))
-    return app
+export function expressConnection() {
+  const app = express();
+  const allowedOrigins = [process.env.FRONTEND_URL, process.env.ADMIN_URL];
+
+  app.use(
+    cors({
+      origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
+      credentials: true,
+    })
+  );
+
+  app.use(express.json());
+  app.use(cookieParser());
+
+  app.use("/", router)
+
+  return app;
 }

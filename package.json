@@ -1,13 +1,44 @@
 {
+  "name": "Backend-Skeleton",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Backend for datalytics for auth & operational APIs",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ve3global/Match-Backend.git"
+  },
+  "author": "Junaid Nayeem",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ve3global/Match-Backend/issues"
+  },
+  "homepage": "https://github.com/ve3global/Match-Backend#readme",
   "dependencies": {
-    "async": "^3.2.5",
-    "body-parser": "^1.20.2",
+    "axios": "^1.6.8",
+    "bcrypt": "^5.0.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "mongoose": "^8.3.2",
+    "express": "^4.21.2",
+    "form-data": "^4.0.1",
+    "http-status": "^2.1.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
     "multer": "^1.4.5-lts.1",
-    "path": "^0.12.7"
+    "nodemailer": "^6.9.15",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "validator": "^13.12.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
   }
 }
