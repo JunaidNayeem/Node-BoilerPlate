@@ -1,19 +1,22 @@
-import express from "express";
+import express from 'express';
+import authRoutes from './AuthRoute.js';
+import projectRoutes from './ProjectRoute.js';
+
 const router = express.Router();
 
-import authRoutes from "./AuthRoute.js";
-
 const routes = [
-    {
-        path: "/",
-        route: authRoutes
-
-    }
+  {
+    path: '/',
+    route: authRoutes,
+  },
+  {
+    path: '/',
+    route: projectRoutes,
+  },
 ];
 
-// Use the routes
 routes.forEach(({ path, route }) => {
-    router.use(path, route);
+  router.use(path, route);
 });
 
 export default router;
