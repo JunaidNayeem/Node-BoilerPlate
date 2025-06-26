@@ -79,11 +79,12 @@ export const register = async (req, res) => {
       });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({
       username,
       email: email.toLowerCase(),
-      password: hashedPassword,
+      // password: hashedPassword,
+      password,
     });
 
     await user.save();

@@ -41,11 +41,12 @@ export const createProject = async (req, res) => {
     };
     const project = new Project(projectData);
     await project.save();
-    req.io.emit('projectUpdate', { action: 'create', project });
+    console.log('project Created ',project);
     return res.status(httpStatus.CREATED).json({
       success: true,
       data: project,
     });
+    
   } catch (error) {
     return errorResponse(res, error);
   }
@@ -62,7 +63,6 @@ export const updateProject = async (req, res) => {
     }
     Object.assign(project, req.body);
     await project.save();
-    req.io.emit('projectUpdate', { action: 'update', project });
     return res.status(httpStatus.OK).json({
       success: true,
       data: project,
