@@ -10,6 +10,7 @@ const projectSchema = new mongoose.Schema(
     github: { type: String },
     liveUrl: { type: String },
     featured: { type: Boolean, default: false },
+    isPublic: { type: Boolean, default: false },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     createdAt: { type: Date, default: Date.now },
   },

@@ -6,6 +6,7 @@ const API_ROUTES = {
   },
   PROJECTS: {
     GET: '/projects',
+    GET_PUBLIC: "/projects/public",
     GET_BY_USER: '/projects/user/:userId',
     CREATE: '/projects',
     UPDATE: '/projects/:id',

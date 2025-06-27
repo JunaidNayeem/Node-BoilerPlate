@@ -1,95 +1,175 @@
-import httpStatus from 'http-status-codes';
-import Project from '../models/Project.js';
-
-const errorResponse = (res, error) => {
-  console.error('Error in projects controller:', error);
-  return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-    success: false,
-    message: 'Server error',
-  });
-};
+import Project from "../models/Project.js"
 
 export const getProjects = async (req, res) => {
   try {
-    const projects = await Project.find({ userId: req.user.userId });
-    return res.status(httpStatus.OK).json({
+    const projects = await Project.find({ userId: req.user.userId })
+      .populate("userId", "username email")
+      .sort({ createdAt: -1 })
+
+    res.status(200).json({
       success: true,
+      message: "Projects fetched successfully",
       data: projects,
-    });
+    })
   } catch (error) {
-    return errorResponse(res, error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching projects",
+      error: error.message,
+    })
   }
-};
+}
+
+export const getPublicProjects = async (req, res) => {
+  try {
+    const projects = await Project.find({ isPublic: true }).populate("userId", "username email").sort({ createdAt: -1 })
+
+    res.status(200).json({
+      success: true,
+      message: "Public projects fetched successfully",
+      data: projects,
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching public projects",
+      error: error.message,
+    })
+  }
+}
 
 export const getProjectsByUser = async (req, res) => {
   try {
-    const projects = await Project.find({ userId: req.params.userId });
-    return res.status(httpStatus.OK).json({
+    const { userId } = req.params
+    const projects = await Project.find({
+      userId,
+    })
+      .populate("userId", "username email")
+      .sort({ createdAt: -1 })
+
+    res.status(200).json({
       success: true,
+      message: "User projects fetched successfully",
       data: projects,
-    });
+    })
   } catch (error) {
-    return errorResponse(res, error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching user projects",
+      error: error.message,
+    })
   }
-};
+}
 
 export const createProject = async (req, res) => {
   try {
-    const projectData = {
-      ...req.body,
+    const { title, description, thumbnail, category, technologies, github, liveUrl, featured, isPublic } = req.body
+
+    console.log("Creating project with isPublic:", isPublic) 
+
+    const project = new Project({
+      title,
+      description,
+      thumbnail,
+      category,
+      technologies,
+      github,
+      liveUrl,
+      featured: featured || false,
+      isPublic: Boolean(isPublic), 
       userId: req.user.userId,
-    };
-    const project = new Project(projectData);
-    await project.save();
-    console.log('project Created ',project);
-    return res.status(httpStatus.CREATED).json({
+    })
+
+    const savedProject = await project.save()
+    await savedProject.populate("userId", "username email")
+
+    console.log("Created project with isPublic:", savedProject.isPublic) 
+
+    res.status(201).json({
       success: true,
-      data: project,
-    });
-    
+      message: "Project created successfully",
+      data: savedProject,
+    })
   } catch (error) {
-    return errorResponse(res, error);
+    res.status(500).json({
+      success: false,
+      message: "Error creating project",
+      error: error.message,
+    })
   }
-};
+}
 
 export const updateProject = async (req, res) => {
   try {
-    const project = await Project.findOne({ _id: req.params.id, userId: req.user.userId });
+    const { id } = req.params
+    const { title, description, thumbnail, category, technologies, github, liveUrl, featured, isPublic } = req.body
+
+    console.log("Updating project with isPublic:", isPublic) 
+    const project = await Project.findOne({ _id: id, userId: req.user.userId })
+
     if (!project) {
-      return res.status(httpStatus.NOT_FOUND).json({
+      return res.status(404).json({
         success: false,
-        message: 'Project not found or unauthorized.',
-      });
+        message: "Project not found or unauthorized",
+      })
     }
-    Object.assign(project, req.body);
-    await project.save();
-    return res.status(httpStatus.OK).json({
+
+    const updatedProject = await Project.findByIdAndUpdate(
+      id,
+      {
+        title,
+        description,
+        thumbnail,
+        category,
+        technologies,
+        github,
+        liveUrl,
+        featured,
+        isPublic: Boolean(isPublic), 
+      },
+      { new: true },
+    ).populate("userId", "username email")
+
+    console.log("Updated project with isPublic:", updatedProject.isPublic)
+
+    res.status(200).json({
       success: true,
-      data: project,
-    });
+      message: "Project updated successfully",
+      data: updatedProject,
+    })
   } catch (error) {
-    return errorResponse(res, error);
+    res.status(500).json({
+      success: false,
+      message: "Error updating project",
+      error: error.message,
+    })
   }
-};
+}
 
 export const deleteProject = async (req, res) => {
   try {
-    const project = await Project.findOneAndDelete({
-      _id: req.params.id,
-      userId: req.user.userId,
-    });
+    const { id } = req.params
+
+    const project = await Project.findOne({ _id: id, userId: req.user.userId })
+
     if (!project) {
-      return res.status(httpStatus.NOT_FOUND).json({
+      return res.status(404).json({
         success: false,
-        message: 'Project not found or unauthorized.',
-      });
+        message: "Project not found or unauthorized",
+      })
     }
-    req.io.emit('projectUpdate', { action: 'delete', project });
-    return res.status(httpStatus.OK).json({
+
+    await Project.findByIdAndDelete(id)
+
+    res.status(200).json({
       success: true,
-      message: 'Project deleted.',
-    });
+      message: "Project deleted successfully",
+    })
   } catch (error) {
-    return errorResponse(res, error);
+    res.status(500).json({
+      success: false,
+      message: "Error deleting project",
+      error: error.message,
+    })
   }
-};
+}
