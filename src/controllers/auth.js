@@ -1,7 +1,7 @@
 import httpStatus from 'http-status-codes';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-const User = require('../models/user.js');
+import User from '../models/user.js';
 
 const errorResponse = (res, error) => {
   console.error('Error in auth controller:', error);
